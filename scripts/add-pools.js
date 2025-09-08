@@ -1,4 +1,4 @@
-const hre = require("hardhat");
+import { ethers } from "hardhat";
 
 async function main() {
   const chefAddress = process.env.CHEF_ADDRESS; // set in .env
