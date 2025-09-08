@@ -1,25 +1,24 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const [deployer] = await hre.ethers.getSigners();
-  const Token = await hre.ethers.getContractFactory("EloquraToken");
+  const [deployer] = await ethers.getSigners();
+
+  const Token = await ethers.getContractFactory("EloquraToken");
   const eloq = await Token.deploy();
-  await eloq.deployed();
-  console.log("ELOQ deployed to:", eloq.address);
+  await eloq.waitForDeployment();
+  const eloqAddr = await eloq.getAddress();
 
-  const MasterChef = await hre.ethers.getContractFactory("EloquraMasterChef");
-  const startBlock = await hre.ethers.provider.getBlockNumber() + 10;
-  const eloqPerBlock = hre.ethers.utils.parseEther("1");
-  const chef = await MasterChef.deploy(eloq.address, eloqPerBlock, startBlock);
-  await chef.deployed();
-  console.log("MasterChef deployed to:", chef.address);
+  const MasterChef = await ethers.getContractFactory("EloquraMasterChef");
+  const startBlock = (await ethers.provider.getBlockNumber()) + 10;
+  const eloqPerBlock = ethers.parseEther("1");
+  const chef = await MasterChef.deploy(eloqAddr, eloqPerBlock, startBlock, deployer.address);
+  await chef.waitForDeployment();
 
-  const rewardAmount = hre.ethers.utils.parseEther("100000000");
-  await eloq.transfer(chef.address, rewardAmount);
-  console.log("Transferred 100M ELOQ to MasterChef");
+  const rewardAmount = ethers.parseEther("100000000");
+  await (await (await ethers.getContractAt("EloquraToken", eloqAddr)).transfer(await chef.getAddress(), rewardAmount)).wait();
+
+  console.log("ELOQ:", eloqAddr);
+  console.log("Chef:", await chef.getAddress());
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+main().catch((e) => { console.error(e); process.exitCode = 1; });

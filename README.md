@@ -34,3 +34,10 @@ ALLOC_POINT=1000
 ## Frontend
 - Copy `artifacts/.../EloquraMasterChef.json` ABI to `frontend/abi/EloquraMasterChef.json` after `npm run build`.
 - The `useFarming.ts` hook uses `wagmi` v2+ and `ethers v6`. Adjust imports to your app's versions if needed.
+- To run the frontend:
+  ```bash
+  cd frontend
+  npm install
+  npm run dev
+  ```
+- Open your browser and go to http://localhost:8080
